@@ -20,7 +20,7 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use("/api/dashboard",verifyToken, dshEksporRoute);
+app.use("/api/dashboard/ekspor",verifyToken, dshEksporRoute);
 
 const PORT = process.env.PORT || 5006;
 app.listen(PORT, () => {
