@@ -14,7 +14,7 @@ app.use(cookieParser());
 
 // CORS hanya izinkan dari localhost:3001
 app.use(cors({
-  origin: "http://localhost:3001",
+  origin: process.env.CLIENT_URL || "http://localhost:3001",
   credentials: true,   // ⬅️ kalau butuh kirim cookie / header auth
 }));
 
