@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import dshEksporRoute from "./routes/dashboard-ekspor.js";
+import dshPrimerRoute from "./routes/dashboard-primer.js";
 import { verifyToken } from "./middleware/auth.js";
 import cookieParser from "cookie-parser";
 
@@ -21,6 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use("/api/dashboard/ekspor",verifyToken, dshEksporRoute);
+app.use("/api/dashboard/primer", dshPrimerRoute);
 
 const PORT = process.env.PORT || 5006;
 app.listen(PORT, () => {
