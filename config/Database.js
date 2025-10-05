@@ -19,4 +19,10 @@ export const db_mutu = new Sequelize(process.env.DB_NAME_MUTU, process.env.DB_US
     timezone: '+07:00'
 });
 
+export const db_kapal = new Sequelize(process.env.DB_NAME_KAPAL, process.env.DB_USER_KAPAL, process.env.DB_PASS_KAPAL, {
+    host: process.env.DB_HOST_KAPAL,
+    dialect: 'mysql',
+    timezone: '+07:00'
+});
+
 export default db_ekspor;

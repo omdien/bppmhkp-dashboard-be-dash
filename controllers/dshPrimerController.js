@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { db_mutu } from "../config/Database.js";
+import { db_mutu, db_kapal } from "../config/Database.js";
 import Tb_propinsi from "../models/tb_propinsi.js";
 
 export const rekap_izin_primer = async (req, res) => {
@@ -10,7 +10,7 @@ export const rekap_izin_primer = async (req, res) => {
         const end = endDate ? `${endDate} 23:59:59` : "2024-12-31 23:59:59";
         const limitNumber = limit ? parseInt(limit) : null;
 
-        /* ---------- 1. Query OSS ---------- */
+        /* ---------- 1. Query OSS (pakai db_mutu) ---------- */
         const queryOSS = `
       SELECT 
         LEFT(oss.kd_daerah, 2) AS kode_propinsi,
@@ -31,17 +31,17 @@ export const rekap_izin_primer = async (req, res) => {
             type: Sequelize.QueryTypes.SELECT,
         });
 
-        /* ---------- 2. Query CBIB Kapal ---------- */
+        /* ---------- 2. Query CBIB Kapal (pakai db_kapal) ---------- */
         const queryCBIBKapal = `
       SELECT 
         nama_provinsi AS propinsi,
         COUNT(*) AS jumlah
-      FROM kapal.tb_cbib_kapal
+      FROM tb_cbib_kapal
       WHERE tgl_terbit BETWEEN :start AND :end
       GROUP BY nama_provinsi
     `;
 
-        const cbibKapalResults = await db_mutu.query(queryCBIBKapal, {
+        const cbibKapalResults = await db_kapal.query(queryCBIBKapal, {
             replacements: { start, end },
             type: Sequelize.QueryTypes.SELECT,
         });
@@ -55,7 +55,6 @@ export const rekap_izin_primer = async (req, res) => {
         });
 
         /* ---------- 4. Inisialisasi Pivot ---------- */
-        const izinKeys = ["CPIB", "CBIB", "CPPIB", "CPOIB", "CDOIB"];
         const pivotMap = {};
         const totalRekap = {
             CPIB: 0,
@@ -97,7 +96,7 @@ export const rekap_izin_primer = async (req, res) => {
             }
         });
 
-        /* ---------- 6. Tambah CBIB Kapal (dipisah kolom) ---------- */
+        /* ---------- 6. Tambah CBIB Kapal (pakai db_kapal) ---------- */
         cbibKapalResults.forEach((row) => {
             const namaPropinsi = row.propinsi?.trim();
 
