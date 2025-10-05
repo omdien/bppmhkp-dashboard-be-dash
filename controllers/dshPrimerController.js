@@ -1,17 +1,17 @@
 import { Sequelize } from "sequelize";
-import {db_mutu} from "../config/Database.js"; 
-import Tb_propinsi from "../models/tb_propinsi.js"; 
-
+import { db_mutu } from "../config/Database.js";
+import Tb_propinsi from "../models/tb_propinsi.js";
 
 export const rekap_izin_primer = async (req, res) => {
     try {
         const { startDate, endDate, limit } = req.query;
 
-        const start = startDate ? `${startDate} 00:00:00` : '2024-01-01 00:00:00';
-        const end = endDate ? `${endDate} 23:59:59` : '2024-12-31 23:59:59';
+        const start = startDate ? `${startDate} 00:00:00` : "2024-01-01 00:00:00";
+        const end = endDate ? `${endDate} 23:59:59` : "2024-12-31 23:59:59";
         const limitNumber = limit ? parseInt(limit) : null;
 
-        const query = `
+        /* ---------- 1. Query OSS ---------- */
+        const queryOSS = `
       SELECT 
         LEFT(oss.kd_daerah, 2) AS kode_propinsi,
         izin.ur_izin_singkat,
@@ -26,19 +26,35 @@ export const rekap_izin_primer = async (req, res) => {
       ORDER BY kode_propinsi, izin.ur_izin_singkat
     `;
 
-        const results = await db_mutu.query(query, {
+        const ossResults = await db_mutu.query(queryOSS, {
             replacements: { start, end },
             type: Sequelize.QueryTypes.SELECT,
         });
 
+        /* ---------- 2. Query CBIB Kapal ---------- */
+        const queryCBIBKapal = `
+      SELECT 
+        nama_provinsi AS propinsi,
+        COUNT(*) AS jumlah
+      FROM kapal.tb_cbib_kapal
+      WHERE tgl_terbit BETWEEN :start AND :end
+      GROUP BY nama_provinsi
+    `;
+
+        const cbibKapalResults = await db_mutu.query(queryCBIBKapal, {
+            replacements: { start, end },
+            type: Sequelize.QueryTypes.SELECT,
+        });
+
+        /* ---------- 3. Mapping Provinsi ---------- */
         const propinsiList = await Tb_propinsi.findAll();
         const propinsiMap = {};
-        propinsiList.forEach(p => {
-            const kode = p.KODE_PROPINSI.toString().padStart(2, '0');
+        propinsiList.forEach((p) => {
+            const kode = p.KODE_PROPINSI.toString().padStart(2, "0");
             propinsiMap[kode] = p.URAIAN_PROPINSI;
         });
 
-        // Setup awal: izin yang ingin ditampilkan
+        /* ---------- 4. Inisialisasi Pivot ---------- */
         const izinKeys = ["CPIB", "CBIB", "CPPIB", "CPOIB", "CDOIB"];
         const pivotMap = {};
         const totalRekap = {
@@ -47,16 +63,16 @@ export const rekap_izin_primer = async (req, res) => {
             CPPIB: 0,
             CPOIB: 0,
             CDOIB: 0,
+            CBIB_Kapal: 0,
             total: 0,
         };
 
-        // Build pivot map
-        results.forEach(row => {
-            const kodePropinsi = row.kode_propinsi.padStart(2, '0');
+        /* ---------- 5. Isi dari OSS ---------- */
+        ossResults.forEach((row) => {
+            const kodePropinsi = row.kode_propinsi.padStart(2, "0");
             const namaPropinsi = propinsiMap[kodePropinsi] || kodePropinsi;
 
             if (!pivotMap[namaPropinsi]) {
-                // Inisialisasi dengan properti terurut
                 pivotMap[namaPropinsi] = {
                     propinsi: namaPropinsi,
                     total: 0,
@@ -65,6 +81,7 @@ export const rekap_izin_primer = async (req, res) => {
                     CPPIB: 0,
                     CPOIB: 0,
                     CDOIB: 0,
+                    CBIB_Kapal: 0,
                 };
             }
 
@@ -72,18 +89,40 @@ export const rekap_izin_primer = async (req, res) => {
             const jumlah = row.jumlah;
 
             if (pivotMap[namaPropinsi].hasOwnProperty(izin)) {
-                pivotMap[namaPropinsi][izin] = jumlah;
+                pivotMap[namaPropinsi][izin] += jumlah;
                 pivotMap[namaPropinsi].total += jumlah;
 
-                // Tambahkan ke total rekap juga
                 totalRekap[izin] += jumlah;
                 totalRekap.total += jumlah;
             }
         });
 
-        let pivotArray = Object.values(pivotMap);
+        /* ---------- 6. Tambah CBIB Kapal (dipisah kolom) ---------- */
+        cbibKapalResults.forEach((row) => {
+            const namaPropinsi = row.propinsi?.trim();
 
-        // Sort by total descending
+            if (!pivotMap[namaPropinsi]) {
+                pivotMap[namaPropinsi] = {
+                    propinsi: namaPropinsi,
+                    total: 0,
+                    CPIB: 0,
+                    CBIB: 0,
+                    CPPIB: 0,
+                    CPOIB: 0,
+                    CDOIB: 0,
+                    CBIB_Kapal: 0,
+                };
+            }
+
+            pivotMap[namaPropinsi].CBIB_Kapal += row.jumlah;
+            pivotMap[namaPropinsi].total += row.jumlah;
+
+            totalRekap.CBIB_Kapal += row.jumlah;
+            totalRekap.total += row.jumlah;
+        });
+
+        /* ---------- 7. Sort & Limit ---------- */
+        let pivotArray = Object.values(pivotMap);
         pivotArray.sort((a, b) => b.total - a.total);
 
         const limitedData =
@@ -95,9 +134,8 @@ export const rekap_izin_primer = async (req, res) => {
             data: limitedData,
             rekap: totalRekap,
         });
-
     } catch (error) {
-        console.error("Error fetching OSS Checklist Rekap:", error);
+        console.error("Error fetching Rekap Izin Primer:", error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
