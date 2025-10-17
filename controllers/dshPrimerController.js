@@ -24,7 +24,7 @@ export const rekap_izin_primer = async (req, res) => {
         AND oss.tgl_izin BETWEEN :start AND :end
       GROUP BY kode_propinsi, izin.ur_izin_singkat
       ORDER BY kode_propinsi, izin.ur_izin_singkat
-    `;
+      `;
 
         const ossResults = await db_mutu.query(queryOSS, {
             replacements: { start, end },
@@ -138,3 +138,93 @@ export const rekap_izin_primer = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+export const propinsi_per_izin = async (req, res) => {
+  try {
+    const { startDate, endDate, kdIzin, limit } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ msg: "Start date and end date are required." });
+    }
+
+    if (!kdIzin || !/^\d{12}$/.test(kdIzin)) {
+      return res.status(400).json({ msg: "kd_izin is required and must be 12 digits." });
+    }
+
+    const izinKapal = "032000000033"; // CPIB Kapal
+    const limitNum = limit ? parseInt(limit, 10) : null;
+
+    let data = [];
+
+    // CASE 1 → OSS
+    if (kdIzin !== izinKapal) {
+      const dataQry = `
+        SELECT
+          COUNT(a.id_izin) AS Jumlah,
+          c.URAIAN_PROPINSI
+        FROM mutu.tr_oss_checklist a
+        JOIN hc.tb_propinsi c 
+          ON c.KODE_PROPINSI = SUBSTRING(a.kd_daerah, 1, 2)
+        WHERE a.sts_aktif = '1'
+          AND a.status_checklist = '50'
+          AND a.tgl_izin BETWEEN :startDate AND :endDate
+          AND a.kd_izin = :kdIzin
+        GROUP BY c.URAIAN_PROPINSI
+        ORDER BY Jumlah DESC
+        ${limitNum ? "LIMIT :limit" : ""}
+      `;
+
+      const replacements = { startDate, endDate, kdIzin };
+      if (limitNum) replacements.limit = limitNum;
+
+      data = await db_mutu.query(dataQry, {
+        replacements,
+        type: Sequelize.QueryTypes.SELECT,
+      });
+    }
+    // CASE 2 → Kapal
+    else {
+      const kapalQry = `
+        SELECT 
+          nama_provinsi AS URAIAN_PROPINSI,
+          COUNT(*) AS Jumlah
+        FROM tb_cbib_kapal
+        WHERE tgl_terbit BETWEEN :startDate AND :endDate
+        GROUP BY nama_provinsi
+        ORDER BY Jumlah DESC
+        ${limitNum ? "LIMIT :limit" : ""}
+      `;
+
+      const replacements = { startDate, endDate };
+      if (limitNum) replacements.limit = limitNum;
+
+      data = await db_kapal.query(kapalQry, {
+        replacements,
+        type: Sequelize.QueryTypes.SELECT,
+      });
+    }
+
+    if (!data || data.length === 0) {
+      return res.status(200).json({
+        success: true,
+        msg: "Data not found for given parameters.",
+        data: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data,
+    });
+
+  } catch (error) {
+    console.error("Error fetching propinsi_per_izin:", error);
+    res.status(500).json({
+      success: false,
+      msg: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+
