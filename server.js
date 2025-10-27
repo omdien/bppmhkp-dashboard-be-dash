@@ -21,7 +21,8 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use("/api/dashboard/ekspor",verifyToken, dshEksporRoute);
+// app.use("/api/dashboard/ekspor",verifyToken, dshEksporRoute);
+app.use("/api/dashboard/ekspor", dshEksporRoute);
 app.use("/api/dashboard/primer",verifyToken, dshPrimerRoute);
 
 const PORT = process.env.PORT || 5006;
