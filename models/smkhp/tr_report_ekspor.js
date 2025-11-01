@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { db_ekspor } from "../config/Database.js";
+import { db_ekspor } from "../../config/Database.js";
 
 const { DataTypes } = Sequelize;
 

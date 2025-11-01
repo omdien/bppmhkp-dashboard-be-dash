@@ -1,4 +1,4 @@
-import Tr_report_ekspor from "../models/tr_report_ekspor.js";
+import Tr_report_ekspor from "../models/smkhp/tr_report_ekspor.js";
 import { Sequelize } from "sequelize";
 
 // get Ekspor Summary

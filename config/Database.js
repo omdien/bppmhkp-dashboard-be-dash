@@ -25,4 +25,10 @@ export const db_kapal = new Sequelize(process.env.DB_NAME_KAPAL, process.env.DB_
     timezone: '+07:00'
 });
 
+export const db_skp = new Sequelize(process.env.DB_NAME_SKP, process.env.DB_USER_SKP, process.env.DB_PASS_SKP, {
+    host: process.env.DB_HOST_SKP,
+    dialect: 'mysql',
+    timezone: '+07:00'
+});
+
 export default db_ekspor;

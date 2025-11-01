@@ -3,6 +3,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import dshEksporRoute from "./routes/dashboard-ekspor.js";
 import dshPrimerRoute from "./routes/dashboard-primer.js";
+
+// route untuk dashboard SKP Lama
+// import dshSKPRoute from "./routes/dashboard-skp.js";
+import dashboardSKPRoute from "./routes/dashboardSKPRoutes.js";
+
+// route untuk dashboard SMKHP analytics
+import smkhpRoutes from "./routes/analytics/smkhpRoutes.js";
+
 import { verifyToken } from "./middleware/auth.js";
 import cookieParser from "cookie-parser";
 
@@ -24,6 +32,9 @@ app.use(express.json());
 // app.use("/api/dashboard/ekspor",verifyToken, dshEksporRoute);
 app.use("/api/dashboard/ekspor", dshEksporRoute);
 app.use("/api/dashboard/primer",verifyToken, dshPrimerRoute);
+// app.use("/api/dashboard/skp", dshSKPRoute);
+app.use("/api/dashboard/skp", dashboardSKPRoute);
+app.use("/api/dashboard/analytics/smkhp", smkhpRoutes);
 
 const PORT = process.env.PORT || 5006;
 app.listen(PORT, () => {
