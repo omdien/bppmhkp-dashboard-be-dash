@@ -1,6 +1,6 @@
 // routes/dashboardSKPRoutes.js
 import express from "express";
-import * as DashboardSKPController from "../controllers/dashboardSKPController.js";
+import * as DashboardSKPController from "../controllers/dshSKP.controller.js";
 
 const router = express.Router();
 
