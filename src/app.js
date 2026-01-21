@@ -7,26 +7,55 @@ import dshPrimerRoute from "./routes/primer.route.js";
 import dashboardSKPRoute from "./routes/skp.routes.js";
 import smkhpRoutes from "./routes/analytics/smkhpRoutes.js";
 
-import { verifyToken } from "./middleware/auth.js";
-
 const app = express();
 
-// Middleware global
+/* =========================
+ * CORS CONFIG (MULTI ORIGIN)
+ * ========================= */
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",")
+  : ["http://localhost:3000"];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow Postman / server to server
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.error("CORS BLOCKED ORIGIN:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
+/* =========================
+ * GLOBAL MIDDLEWARE
+ * ========================= */
 app.use(cookieParser());
-
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3001",
-    credentials: true,
-  })
-);
-
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Routes
+/* =========================
+ * ROUTES
+ * ========================= */
 app.use("/api/dashboard/ekspor", dshEksporRoute);
-app.use("/api/dashboard/primer", verifyToken, dshPrimerRoute);
+app.use("/api/dashboard/primer", dshPrimerRoute);
 app.use("/api/dashboard/skp", dashboardSKPRoute);
 app.use("/api/dashboard/analytics/smkhp", smkhpRoutes);
+
+/* =========================
+ * CORS ERROR HANDLER
+ * ========================= */
+app.use((err, req, res, next) => {
+  if (err.message === "Not allowed by CORS") {
+    return res.status(403).json({
+      message: "CORS blocked this origin",
+    });
+  }
+  next(err);
+});
 
 export default app;

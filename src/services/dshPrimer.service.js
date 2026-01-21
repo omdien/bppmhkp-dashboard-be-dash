@@ -50,8 +50,13 @@ export const rekapIzinPrimer = async ({
   });
 
   // Kapal
+  // Kapal (FIXED)
   kapalRows.forEach((r) => {
-    const nama = r.propinsi?.trim();
+    if (!r.kode_provinsi) return; // safety
+
+    const kode = r.kode_provinsi.padStart(2, "0");
+    const nama = propinsiMap[kode] || kode;
+
     pivotMap[nama] ??= {
       propinsi: nama,
       CPIB: 0,
@@ -69,6 +74,7 @@ export const rekapIzinPrimer = async ({
     total.CBIB_Kapal += r.jumlah;
     total.total += r.jumlah;
   });
+
 
   let result = Object.values(pivotMap).sort((a, b) => b.total - a.total);
 
