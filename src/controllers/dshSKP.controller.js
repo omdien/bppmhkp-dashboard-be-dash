@@ -10,13 +10,38 @@ const getRange = (req) => {
 };
 
 /**
- * Utility: Template handler untuk semua endpoint
+ * Utility: ambil limit dari query (opsional)
+ * - jika tidak ada / invalid → undefined
+ */
+const getLimit = (req) => {
+  const { limit } = req.query;
+  const parsed = parseInt(limit, 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+};
+
+/**
+ * Utility: Template handler (tanpa limit)
  */
 const handleDashboardRequest = async (serviceFn, req, res, label) => {
   try {
     const { startDate, endDate } = getRange(req);
     const data = await serviceFn(startDate, endDate);
-    res.json(data); // ✅ hanya data (tanpa success)
+    res.json(data);
+  } catch (err) {
+    console.error(`${label} error:`, err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * Utility: Template handler (dengan limit opsional)
+ */
+const handleDashboardRequestWithLimit = async (serviceFn, req, res, label) => {
+  try {
+    const { startDate, endDate } = getRange(req);
+    const limit = getLimit(req); // ← di sini bedanya
+    const data = await serviceFn(startDate, endDate, limit);
+    res.json(data);
   } catch (err) {
     console.error(`${label} error:`, err);
     res.status(500).json({ message: err.message });
@@ -27,52 +52,97 @@ const handleDashboardRequest = async (serviceFn, req, res, label) => {
    🔹 1. Resume Utama
    ============================================================ */
 export const getResumeSKP = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getResumeSKP, req, res, "getResumeSKP");
+  handleDashboardRequest(
+    DashboardSKPService.getResumeSKP,
+    req,
+    res,
+    "getResumeSKP"
+  );
 
 /* ============================================================
    🔹 2. Tren Bulanan
    ============================================================ */
 export const getTrenBulanan = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getTrenBulanan, req, res, "getTrenBulanan");
+  handleDashboardRequest(
+    DashboardSKPService.getTrenBulanan,
+    req,
+    res,
+    "getTrenBulanan"
+  );
 
 /* ============================================================
    🔹 3. Komposisi Peringkat
    ============================================================ */
 export const getKomposisiPeringkat = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getKomposisiPeringkat, req, res, "getKomposisiPeringkat");
+  handleDashboardRequest(
+    DashboardSKPService.getKomposisiPeringkat,
+    req,
+    res,
+    "getKomposisiPeringkat"
+  );
 
 /* ============================================================
    🔹 4. Komposisi Jenis Permohonan
    ============================================================ */
 export const getKomposisiPermohonan = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getKomposisiPermohonan, req, res, "getKomposisiPermohonan");
+  handleDashboardRequest(
+    DashboardSKPService.getKomposisiPermohonan,
+    req,
+    res,
+    "getKomposisiPermohonan"
+  );
 
 /* ============================================================
    🔹 5. Komposisi Jenis Olahan
    ============================================================ */
 export const getKomposisiOlahan = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getKomposisiOlahan, req, res, "getKomposisiOlahan");
+  handleDashboardRequest(
+    DashboardSKPService.getKomposisiOlahan,
+    req,
+    res,
+    "getKomposisiOlahan"
+  );
 
 /* ============================================================
    🔹 6. Distribusi Skala Usaha
    ============================================================ */
 export const getDistribusiSkalaUsaha = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getDistribusiSkalaUsaha, req, res, "getDistribusiSkalaUsaha");
+  handleDashboardRequest(
+    DashboardSKPService.getDistribusiSkalaUsaha,
+    req,
+    res,
+    "getDistribusiSkalaUsaha"
+  );
 
 /* ============================================================
-   🔹 7. Top 10 Provinsi
+   🔹 7. Top Provinsi (limit opsional)
    ============================================================ */
 export const getTopProvinsi = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getTopProvinsi, req, res, "getTopProvinsi");
+  handleDashboardRequestWithLimit(
+    DashboardSKPService.getTopProvinsi,
+    req,
+    res,
+    "getTopProvinsi"
+  );
 
 /* ============================================================
-   🔹 8. Top 10 Kabupaten
+   🔹 8. Top Kabupaten (limit opsional)
    ============================================================ */
 export const getTopKabupaten = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getTopKabupaten, req, res, "getTopKabupaten");
+  handleDashboardRequestWithLimit(
+    DashboardSKPService.getTopKabupaten,
+    req,
+    res,
+    "getTopKabupaten"
+  );
 
 /* ============================================================
-   🔹 9. Top 10 UPI
+   🔹 9. Top UPI (limit opsional)
    ============================================================ */
 export const getTopUPI = (req, res) =>
-  handleDashboardRequest(DashboardSKPService.getTopUPI, req, res, "getTopUPI");
+  handleDashboardRequestWithLimit(
+    DashboardSKPService.getTopUPI,
+    req,
+    res,
+    "getTopUPI"
+  );

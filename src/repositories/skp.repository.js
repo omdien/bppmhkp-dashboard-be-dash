@@ -8,8 +8,13 @@ const buildWhere = (startDate, endDate) => {
   const now = new Date();
   const year = now.getFullYear();
 
-  const rangeStart = startDate ? new Date(startDate) : new Date(`${year}-01-01`);
-  const rangeEnd = endDate ? new Date(endDate) : new Date(`${year}-12-31`);
+  const rangeStart = startDate
+    ? `${startDate} 00:00:00`
+    : `${year}-01-01 00:00:00`;
+
+  const rangeEnd = endDate
+    ? `${endDate} 23:59:59`
+    : `${year}-12-31 23:59:59`;
 
   return {
     tanggal_terbit: {
@@ -50,7 +55,7 @@ export const trenBulanan = async (startDate, endDate) => {
 export const groupCount = async (field, startDate, endDate, limit) => {
   const where = buildWhere(startDate, endDate);
 
-  return TbSkpPaska.findAll({
+  const options = {
     attributes: [
       field,
       [Sequelize.fn("COUNT", Sequelize.col("id")), "jumlah"],
@@ -58,7 +63,13 @@ export const groupCount = async (field, startDate, endDate, limit) => {
     where,
     group: [field],
     order: [[Sequelize.literal("jumlah"), "DESC"]],
-    limit,
     raw: true,
-  });
+  };
+
+  if (Number.isInteger(limit) && limit > 0) {
+    options.limit = limit;
+  }
+
+  return TbSkpPaska.findAll(options);
 };
+

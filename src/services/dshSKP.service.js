@@ -38,11 +38,11 @@ export const getDistribusiSkalaUsaha = (s, e) =>
 /* ============================================================
    7–9. Top Data
    ============================================================ */
-export const getTopProvinsi = (s, e) =>
-  Repo.groupCount("provinsi", s, e, 10);
+export const getTopProvinsi = (s, e, limit) =>
+  Repo.groupCount("provinsi", s, e, limit);
 
-export const getTopKabupaten = (s, e) =>
-  Repo.groupCount("kota_kabupaten", s, e, 10);
+export const getTopKabupaten = (s, e, limit) =>
+  Repo.groupCount("kota_kabupaten", s, e, limit);
 
-export const getTopUPI = (s, e) =>
-  Repo.groupCount("nib", s, e, 10);
+export const getTopUPI = (s, e, limit) =>
+  Repo.groupCount("nib", s, e, limit);

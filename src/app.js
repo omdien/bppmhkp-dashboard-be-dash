@@ -6,6 +6,7 @@ import dshEksporRoute from "./routes/ekspor.routes.js";
 import dshPrimerRoute from "./routes/primer.route.js";
 import dashboardSKPRoute from "./routes/skp.routes.js";
 import smkhpRoutes from "./routes/analytics/smkhpRoutes.js";
+import haccpRoutes from "./routes/haccp.route.js";
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use("/api/dashboard/ekspor", dshEksporRoute);
 app.use("/api/dashboard/primer", dshPrimerRoute);
 app.use("/api/dashboard/skp", dashboardSKPRoute);
 app.use("/api/dashboard/analytics/smkhp", smkhpRoutes);
+app.use("/api/dashboard/haccp", haccpRoutes);
 
 /* =========================
  * CORS ERROR HANDLER
@@ -56,6 +58,14 @@ app.use((err, req, res, next) => {
     });
   }
   next(err);
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "dashboard-skp",
+    time: new Date().toISOString(),
+  });
 });
 
 export default app;
