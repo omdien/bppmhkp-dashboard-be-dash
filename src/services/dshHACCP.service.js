@@ -88,3 +88,39 @@ export const getHACCPPerPropinsiPerGrade = async ({
     totGradeC,
   };
 };
+
+export const getHaccpPerBulan = async (startDate, endDate) => {
+  const rawData = await Repo.getHaccpPerBulanRaw(startDate, endDate);
+
+  const bulanList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const pivot = {};
+
+  rawData.forEach((row) => {
+    const grade = row.grade || "UNKNOWN";
+    const bulan = Number(row.bulan);
+    const jumlah = Number(row.jumlah) || 0;
+
+    if (!pivot[grade]) {
+      pivot[grade] = {};
+      bulanList.forEach((b) => (pivot[grade][b] = 0));
+    }
+
+    pivot[grade][bulan] = jumlah;
+  });
+
+  return Object.entries(pivot).map(([grade, bulanData]) => ({
+    grade,
+    jan: bulanData[1],
+    feb: bulanData[2],
+    mar: bulanData[3],
+    apr: bulanData[4],
+    mei: bulanData[5],
+    jun: bulanData[6],
+    jul: bulanData[7],
+    aug: bulanData[8],
+    sep: bulanData[9],
+    okt: bulanData[10],
+    nov: bulanData[11],
+    des: bulanData[12],
+  }));
+};

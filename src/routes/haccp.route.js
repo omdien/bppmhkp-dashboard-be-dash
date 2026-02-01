@@ -2,6 +2,7 @@
 import express from "express";
 import {
   getHACCPPerPropinsiPerGrade,
+  getHaccpPerBulan
 } from "../controllers/dshHACCP.controller.js";
 
 const router = express.Router();
@@ -14,9 +15,7 @@ const router = express.Router();
  *  - endDate   (YYYY-MM-DD) [required]
  *  - limit     (number | optional)
  */
-router.get(
-  "/propinsi-grade",
-  getHACCPPerPropinsiPerGrade
-);
+router.get("/propinsi-grade", getHACCPPerPropinsiPerGrade);
+router.get("/haccp-per-bulan",getHaccpPerBulan);
 
 export default router;

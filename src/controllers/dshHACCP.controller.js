@@ -50,3 +50,35 @@ export const getHACCPPerPropinsiPerGrade = (req, res) =>
     res,
     "getHACCPPerPropinsiPerGrade"
   );
+
+// controllers/dshHACCP.controller.js
+export const getHaccpPerBulan = async (req, res) => {
+  try {
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        message: "startDate dan endDate wajib diisi (YYYY-MM-DD)",
+      });
+    }
+
+    const data = await HACCPService.getHaccpPerBulan(
+      startDate,
+      endDate
+    );
+
+    res.json({
+      startDate,
+      endDate,
+      data,
+    });
+  } catch (error) {
+    console.error("getHaccpPerBulan error:", error);
+    res.status(500).json({
+      message: "Terjadi kesalahan pada server",
+    });
+  }
+};
+
+

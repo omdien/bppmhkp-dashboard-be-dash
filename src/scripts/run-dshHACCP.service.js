@@ -2,38 +2,53 @@
 import "dotenv/config";
 import {
   getHACCPPerPropinsiPerGrade,
+  getHaccpPerBulan,
 } from "../services/dshHACCP.service.js";
 
 async function run() {
   const startDate = "2025-01-01";
   const endDate = "2025-12-31";
-  const limit = 10; // ganti null / 'all' kalau mau semua
+  const limit = 10;
+  const tahun = 2025;
 
   try {
-    console.log("\n==============================");
+    /* =====================================================
+       TEST 1: HACCP PER PROPINSI PER GRADE
+       (SUDAH FIX – JANGAN DIUBAH)
+       ===================================================== */
+    console.log("\n========================================");
     console.log("📊 HACCP PER PROPINSI PER GRADE");
-    console.log("==============================\n");
+    console.log("========================================\n");
 
-    const result = await getHACCPPerPropinsiPerGrade({
+    const perProvinsi = await getHACCPPerPropinsiPerGrade({
       startDate,
       endDate,
       limit,
     });
 
-    // 🔹 Data utama
-    console.table(result.data);
+    console.table(perProvinsi.data);
 
-    // 🔹 Ringkasan
     console.log("\n🔢 RINGKASAN:");
-    console.log("Total HACCP :", result.totHACCP);
-    console.log("Grade A     :", result.totGradeA);
-    console.log("Grade B     :", result.totGradeB);
-    console.log("Grade C     :", result.totGradeC);
+    console.log("Total HACCP :", perProvinsi.totHACCP);
+    console.log("Grade A     :", perProvinsi.totGradeA);
+    console.log("Grade B     :", perProvinsi.totGradeB);
+    console.log("Grade C     :", perProvinsi.totGradeC);
 
-    console.log("\n✅ TEST HACCP SERVICE SELESAI\n");
+    /* =====================================================
+       TEST 2: HACCP PER BULAN (GRADE x BULAN)
+       ===================================================== */
+    console.log("\n========================================");
+    console.log(`📅 HACCP PER BULAN (${tahun})`);
+    console.log("========================================\n");
+
+    const perBulan = await getHaccpPerBulan(startDate, endDate);
+
+    console.table(perBulan);
+
+    console.log("\n✅ SEMUA TEST HACCP SERVICE SELESAI\n");
   } catch (error) {
     console.error("\n❌ ERROR TEST HACCP SERVICE");
-    console.error(error);
+    console.error(error.message);
   } finally {
     process.exit(0);
   }
