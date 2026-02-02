@@ -124,3 +124,22 @@ export const getHaccpPerBulan = async (startDate, endDate) => {
     des: bulanData[12],
   }));
 };
+
+export const getHaccpPerTahun = async (startDate, endDate) => {
+  const rows = await Repo.findHaccpPerTahun(startDate, endDate);
+
+  const result = {};
+  let total = 0;
+
+  rows.forEach((row) => {
+    const grade = row.grade;
+    const jumlah = Number(row.jumlah) || 0;
+
+    result[grade] = jumlah;
+    total += jumlah;
+  });
+
+  result.JUMLAH = total;
+
+  return result;
+};

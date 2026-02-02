@@ -42,3 +42,22 @@ export const getHaccpPerBulanRaw = async (startDate, endDate) => {
   });
 };
 
+export const findHaccpPerTahun = async (startDate, endDate) => {
+  return await Vw07_sertifikasi.findAll({
+    attributes: [
+      "grade",
+      [Sequelize.fn("COUNT", Sequelize.col("no_haccp")), "jumlah"],
+    ],
+    where: {
+      no_haccp: { [Op.ne]: null },
+      status_sert: "BERLAKU",
+      tgl_terbit: {
+        [Op.between]: [startDate, endDate],
+      },
+    },
+    group: ["grade"],
+    raw: true,
+  });
+};
+
+

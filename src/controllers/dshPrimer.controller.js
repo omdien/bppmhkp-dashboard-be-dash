@@ -29,3 +29,4 @@ export const propinsiPerIzin = async (req, res, next) => {
     next(err);
   }
 };
+

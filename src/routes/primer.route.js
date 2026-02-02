@@ -1,9 +1,4 @@
 import express from "express";
-// import {
-    // rekap_izin_primer,
-    // propinsi_per_izin
-// } from "../controllers/dshPrimerController.js";
-
 import {
     rekapIzinPrimer,
     propinsiPerIzin
