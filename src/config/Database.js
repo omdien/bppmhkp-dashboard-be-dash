@@ -36,4 +36,10 @@ export const db_siha = new Sequelize('mutu','root','', {
     dialect: 'mysql'
 });
 
+export const db_report_primer = new Sequelize(process.env.DB_NAME_PRIMER, process.env.DB_USER_PRIMER, process.env.DB_PASS_PRIMER, {
+    host: process.env.DB_HOST_PRIMER,
+    dialect: 'mysql',
+    timezone: '+07:00'
+});
+
 export default db_ekspor;

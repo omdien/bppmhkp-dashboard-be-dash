@@ -30,3 +30,29 @@ export const propinsiPerIzin = async (req, res, next) => {
   }
 };
 
+// Handler Baru
+export const rekapIzinPrimer2 = async (req, res, next) => {
+  try {
+    // Pastikan menangkap startDate & endDate dari req.query
+    const result = await service.rekapIzinPrimer2(req.query);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Opsional: Jika propinsiPerIzin juga ingin arahkan ke tabel export
+export const propinsiPerIzin2 = async (req, res, next) => {
+  try {
+    const { startDate, endDate, kdIzin } = req.query;
+    if (!startDate || !endDate || !kdIzin) {
+      return res.status(400).json({ msg: "Parameter tidak lengkap." });
+    }
+
+    const data = await service.getPropinsiPerIzin2(req.query);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    next(err);
+  }
+};
+
