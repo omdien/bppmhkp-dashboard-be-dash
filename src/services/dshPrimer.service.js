@@ -126,6 +126,8 @@ export const rekapIzinPrimer2 = async ({ startDate, endDate, limit }) => {
     CBIB_Kapal: 0, total: 0,
   };
 
+
+  console.log("Data primerRows:", primerRows);
   // Process data dari tabel Export
   primerRows.forEach((r) => {
     const nama = propinsiMap[r.kode_propinsi] || r.kode_propinsi;

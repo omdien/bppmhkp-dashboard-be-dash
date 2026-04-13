@@ -5,7 +5,7 @@ export const getRekapPrimerExport = async (startDate, endDate) => {
   try {
     const query = `
       SELECT 
-        LEFT(perseroan_daerah_id, 2) as kode_propinsi,
+        LEFT(kd_daerah, 2) as kode_propinsi,
         ur_izin_singkat, 
         COUNT(*) as jumlah
       FROM tr_laporan_primer_export
