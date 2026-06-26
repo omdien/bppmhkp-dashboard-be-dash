@@ -143,3 +143,82 @@ export const getHaccpPerTahun = async (startDate, endDate) => {
 
   return result;
 };
+
+// GeoJSON HACCP untuk peta sebar
+export const getGeoHACCP = async ({
+  startDate,
+  endDate,
+}) => {
+  if (!startDate || !endDate) {
+    throw new Error("startDate dan endDate wajib diisi");
+  }
+
+  // 🔹 ambil data mentah dari repository
+  const rawData = await Repo.getGeoHACCP(
+    startDate,
+    endDate
+  );
+
+  const resultMap = {};
+
+  let totHACCP = 0;
+  let totGradeA = 0;
+  let totGradeB = 0;
+  let totGradeC = 0;
+
+  // 🔹 olah data pivot
+  rawData.forEach((row) => {
+    const kode_propinsi = row.kode_propinsi;
+    const propinsi = row.propinsi;
+    const grade = (row.grade || "").toUpperCase();
+    const jumlah = Number(row.jumlah) || 0;
+
+    totHACCP += jumlah;
+
+    if (!resultMap[kode_propinsi]) {
+      resultMap[kode_propinsi] = {
+        kode_propinsi: kode_propinsi,
+        propinsi: propinsi,
+        grade_a: 0,
+        grade_b: 0,
+        grade_c: 0,
+      };
+    }
+
+    switch (grade) {
+      case "A":
+        resultMap[kode_propinsi].grade_a += jumlah;
+        totGradeA += jumlah;
+        break;
+      case "B":
+        resultMap[kode_propinsi].grade_b += jumlah;
+        totGradeB += jumlah;
+        break;
+      case "C":
+        resultMap[kode_propinsi].grade_c += jumlah;
+        totGradeC += jumlah;
+        break;
+      default:
+        break;
+    }
+  });
+
+  // 🔹 ubah ke array + hitung total per propinsi
+  let result = Object.values(resultMap).map((item) => ({
+    ...item,
+    jumlah: item.grade_a + item.grade_b + item.grade_c,
+  }));
+
+  // 🔹 sort terbesar ke kecil
+  result.sort((a, b) => b.jumlah - a.jumlah);
+
+  // 🔹 Blok kode 'if (Number.isInteger(limit)...)' sudah dihapus di sini
+
+  // 🔹 response konsisten dengan dashboard lain
+
+  return result;
+};
+
+// GeoJSON UPI untuk peta sebar
+export const getGeoUPI = (startDate, endDate) => 
+  Repo.getGeoUPI(startDate, endDate);

@@ -146,3 +146,14 @@ export const getTopUPI = (req, res) =>
     res,
     "getTopUPI"
   );
+
+/* ============================================================
+   🔹 10. Geo Spatial Data
+   ============================================================ */
+export const getGeoSKP = (req, res) =>
+  handleDashboardRequest(
+    DashboardSKPService.getGeoSKP,
+    req,
+    res,
+    "getGeoSKP"
+  );

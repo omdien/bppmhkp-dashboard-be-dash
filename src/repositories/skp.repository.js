@@ -73,3 +73,18 @@ export const groupCount = async (field, startDate, endDate, limit) => {
   return TbSkpPaska.findAll(options);
 };
 
+export const geoSKP = async (startDate, endDate) => {
+  const where = buildWhere(startDate, endDate);
+
+  const options = {
+    attributes: [
+      [Sequelize.col("provinsi_id"), "kode_propinsi"],
+      [Sequelize.fn("UPPER", Sequelize.col("provinsi")), "propinsi"],
+      [Sequelize.fn("COUNT", Sequelize.col("id")), "SKP"],
+    ],
+    where,
+    group: [Sequelize.col("provinsi_id"), Sequelize.col("provinsi")],
+    raw: true,
+  };
+  return TbSkpPaska.findAll(options);
+};

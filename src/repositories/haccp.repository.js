@@ -60,4 +60,50 @@ export const findHaccpPerTahun = async (startDate, endDate) => {
   });
 };
 
+// GeoJSON HACCP untuk peta sebar
+export const getGeoHACCP = async (startDate, endDate) => {
+  return Vw07_sertifikasi.findAll({
+    attributes: [
+      [Sequelize.col("id_provinsi"), "kode_propinsi"],
+      [Sequelize.fn("UPPER", Sequelize.col("nm_provinsi")), "propinsi"],
+      "grade",
+      [fn("COUNT", col("no_haccp")), "jumlah"],
+    ],
+    where: {
+      no_haccp: { [Op.ne]: null },
+      status_sert: "BERLAKU",
+      tgl_terbit: {
+        [Op.between]: [startDate, endDate],
+      },
+    },
+    group: [
+      Sequelize.col("id_provinsi"),
+      Sequelize.col("nm_provinsi"),
+      "grade"
+    ],
+    raw: true, // penting: hasil plain object
+  });
+};
 
+// GeoJSON UPIuntuk peta sebar
+export const getGeoUPI = async (startDate, endDate) => {
+  return Vw07_sertifikasi.findAll({
+    attributes: [
+      [Sequelize.col("id_provinsi"), "kode_propinsi"],
+      [Sequelize.fn("UPPER", Sequelize.col("nm_provinsi")), "propinsi"],
+      [fn("COUNT", col("upi_name")), "jmlUPI"],
+    ],
+    where: {
+      no_haccp: { [Op.ne]: null },
+      status_sert: "BERLAKU",
+      tgl_terbit: {
+        [Op.between]: [startDate, endDate],
+      },
+    },
+    group: [
+      Sequelize.col("id_provinsi"),
+      Sequelize.col("nm_provinsi"),
+    ],
+    raw: true, // penting: hasil plain object
+  });
+};

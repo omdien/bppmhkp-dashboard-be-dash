@@ -7,6 +7,7 @@ import dshPrimerRoute from "./routes/primer.route.js";
 import dashboardSKPRoute from "./routes/skp.routes.js";
 import smkhpRoutes from "./routes/analytics/smkhpRoutes.js";
 import haccpRoutes from "./routes/haccp.route.js";
+import commonRoutes from "./routes/common.routes.js";
 
 const app = express();
 
@@ -47,7 +48,7 @@ app.use("/api/dashboard/primer", dshPrimerRoute);
 app.use("/api/dashboard/skp", dashboardSKPRoute);
 app.use("/api/dashboard/analytics/smkhp", smkhpRoutes);
 app.use("/api/dashboard/haccp", haccpRoutes);
-
+app.use("/api/dashboard/common", commonRoutes);
 /* =========================
  * CORS ERROR HANDLER
  * ========================= */

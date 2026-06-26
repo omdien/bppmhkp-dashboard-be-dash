@@ -106,3 +106,27 @@ export const getHaccpPerTahun = async (req, res) => {
   }
 };
 
+/* ============================================================
+   🔹 GeoJSON HACCP
+   ============================================================ */
+export const getGeoHACCP = (req, res) =>
+  handleRequest(
+    HACCPService.getGeoHACCP,
+    req,
+    res,
+    "getGeoHACCP"
+  );
+
+/* ============================================================
+ 🔹 GeoJSON HACCP UPI
+ ============================================================ */
+export const getGeoUPI = (req, res) => {
+  const { startDate, endDate } = req.query; // Memastikan parameter diambil
+  
+  handleRequest(
+    () => HACCPService.getGeoUPI(startDate, endDate), // Memastikan parameter dikirim
+    req,
+    res,
+    "getGeoUPI"
+  );
+};

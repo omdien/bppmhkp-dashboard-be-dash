@@ -4,6 +4,8 @@ import {
   getHACCPPerPropinsiPerGrade,
   getHaccpPerBulan,
   getHaccpPerTahun,
+  getGeoHACCP,
+  getGeoUPI
 } from "../controllers/dshHACCP.controller.js";
 
 const router = express.Router();
@@ -19,5 +21,7 @@ const router = express.Router();
 router.get("/propinsi-grade", getHACCPPerPropinsiPerGrade);
 router.get("/haccp-per-bulan",getHaccpPerBulan);
 router.get("/haccp-per-tahun",getHaccpPerTahun);
+router.get("/geo-haccp", getGeoHACCP);
+router.get("/geo-upi", getGeoUPI);
 
 export default router;

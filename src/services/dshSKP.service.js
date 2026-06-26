@@ -46,3 +46,9 @@ export const getTopKabupaten = (s, e, limit) =>
 
 export const getTopUPI = (s, e, limit) =>
   Repo.groupCount("nib", s, e, limit);
+
+/* ============================================================
+   10. Geo Spatial Data
+   ============================================================ */
+export const getGeoSKP = (s, e) =>
+  Repo.geoSKP(s, e);

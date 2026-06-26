@@ -19,4 +19,7 @@ router.get("/top-provinsi", DashboardSKPController.getTopProvinsi);
 router.get("/top-kabupaten", DashboardSKPController.getTopKabupaten);
 router.get("/top-upi", DashboardSKPController.getTopUPI);
 
+// 🗺️ Geo Spatial Data
+router.get("/geo-skp", DashboardSKPController.getGeoSKP);
+
 export default router;
