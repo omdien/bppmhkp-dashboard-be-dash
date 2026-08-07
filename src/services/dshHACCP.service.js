@@ -173,7 +173,8 @@ export const getGeoHACCP = async ({
 
   // 🔹 olah data pivot
   rawData.forEach((row) => {
-    const kode_propinsi = row.kode_propinsi;
+    const kode_propinsi_internal = row.kode_propinsi;
+    const kode_propinsi = INTERNAL_TO_BPS[kode_propinsi_internal] || null;
     const propinsi = row.propinsi;
     const grade = (row.grade || "").toUpperCase();
     const jumlah = Number(row.jumlah) || 0;

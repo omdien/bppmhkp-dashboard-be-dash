@@ -31,7 +31,7 @@ export const db_skp = new Sequelize(process.env.DB_NAME_SKP, process.env.DB_USER
     timezone: '+07:00'
 });
 
-export const db_siha = new Sequelize('mutu','root','', {
+export const db_siha = new Sequelize(process.env.DB_NAME_HACCP, process.env.DB_USER_HACCP,process.env.DB_PASS_HACCP, {
     host: process.env.DB_HOST_HACCP,
     dialect: 'mysql'
 });
