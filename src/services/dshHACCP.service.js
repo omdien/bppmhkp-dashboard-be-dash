@@ -1,5 +1,7 @@
 // src/services/dshHACCP.service.js
 import * as Repo from "../repositories/haccp.repository.js";
+import { INTERNAL_TO_BPS } from "../utils/provinsiMap.js";
+
 
 /**
  * 📊 HACCP per Propinsi per Grade
@@ -32,6 +34,8 @@ export const getHACCPPerPropinsiPerGrade = async ({
 
   // 🔹 olah data pivot
   rawData.forEach((row) => {
+    const kode_propinsi_internal = row.kode_propinsi;
+    const kode_propinsi = INTERNAL_TO_BPS[kode_propinsi_internal] || null; // 🔹 konversi ke kode BPS
     const provinsi = row.nm_provinsi;
     const grade = (row.grade || "").toUpperCase();
     const jumlah = Number(row.jumlah) || 0;
@@ -40,6 +44,7 @@ export const getHACCPPerPropinsiPerGrade = async ({
 
     if (!resultMap[provinsi]) {
       resultMap[provinsi] = {
+        kode_propinsi: kode_propinsi,       // sekarang sudah kode BPS
         nm_provinsi: provinsi,
         grade_a: 0,
         grade_b: 0,
@@ -220,5 +225,5 @@ export const getGeoHACCP = async ({
 };
 
 // GeoJSON UPI untuk peta sebar
-export const getGeoUPI = (startDate, endDate) => 
+export const getGeoUPI = (startDate, endDate) =>
   Repo.getGeoUPI(startDate, endDate);
