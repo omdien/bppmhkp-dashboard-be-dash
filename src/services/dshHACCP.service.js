@@ -226,5 +226,16 @@ export const getGeoHACCP = async ({
 };
 
 // GeoJSON UPI untuk peta sebar
-export const getGeoUPI = (startDate, endDate) =>
-  Repo.getGeoUPI(startDate, endDate);
+export const getGeoUPI = async (startDate, endDate) => {
+  const rawData = await Repo.getGeoUPI(startDate, endDate);
+
+  return rawData.map((row) => {
+    const kode_propinsi_internal = row.kode_propinsi;
+    const kode_propinsi = INTERNAL_TO_BPS[kode_propinsi_internal] || null; // 🔹 konversi ke kode BPS
+
+    return {
+      ...row,
+      kode_propinsi, // timpa dengan kode BPS
+    };
+  });
+};
